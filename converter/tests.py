@@ -40,5 +40,46 @@ class RomanToArabConverterTest(unittest.TestCase):
             self.assertTrue(True)
 
 
+class ArabToRomanConverterTest(unittest.TestCase):
+    def setUp(self):
+        self.conv = Converter()
+
+
+    def test_valid_input(self):
+        self.assertEqual(self.conv.arab_to_roman(317),  'CCCXVII')
+        self.assertEqual(self.conv.arab_to_roman(199),  'CXCIX')
+        self.assertEqual(self.conv.arab_to_roman(149),  'CXLIX')
+        self.assertEqual(self.conv.arab_to_roman(1721), 'MDCCXXI')
+        self.assertEqual(self.conv.arab_to_roman(2975), 'MMCMLXXV')
+
+
+    def test_invalid_input(self):
+        try:
+            self.conv.arab_to_roman('432a')
+            self.assertTrue(False)
+        except ValueError:
+            self.assertTrue(True)
+
+        try:
+            self.conv.arab_to_roman('')
+            self.assertTrue(False)
+        except ValueError:
+            self.assertTrue(True)
+
+        try:
+            self.conv.arab_to_roman(-3)
+            self.assertTrue(False)
+        except ValueError:
+            self.assertTrue(True)
+
+
+    def test_overflow(self):
+        try:
+            self.conv.arab_to_roman('43242')
+            self.assertTrue(False)
+        except ValueError:
+            self.assertTrue(True)
+
+
 if __name__ == '__main__':
     unittest.main()
