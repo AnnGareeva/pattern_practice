@@ -21,7 +21,6 @@ class Converter:
             arab_num = int(arab_num)
         except:
             raise ValueError('Invalid input value')
-        # if isinstance(arab_num, (int)):
         if arab_num > 0:
             if arab_num > 3000:
                 raise ValueError('Input value must be < 3000')
@@ -29,8 +28,6 @@ class Converter:
                 return True
         else:
             raise ValueError('Input value must be > 0')
-        # else:
-        #     raise ValueError('Invalid input value')
     
 
     def arab_to_roman(self, arab_num):
