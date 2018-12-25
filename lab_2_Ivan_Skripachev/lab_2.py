@@ -1,8 +1,9 @@
 import os
 import sys
+import copy
 import argparse
+from itertools import product
 
-MAX_LEN_LINE = 35
 NUM_LINES_IN_DIGIT = 4
 NUM_DIGITS = 9
 DIGIT_WIDTH = 3
@@ -58,11 +59,64 @@ def write_file(file_name, data):
 
 
 def convert_digits(raw_digits_list):
-    result = ''
+    result = []
+    was_recovered = False
+
     for digit in raw_digits_list:
         key = ('').join(digit)
-        result += digits_dict.get(key, '?')
+        if key in digits_dict:
+            digit = [digits_dict[key]]
+        else:
+            digit = recovery_digit(digit)
+            was_recovered = True
+        result.append(digit)
+    
+    result = list(product(*result))
+    for i in range(len(result)):
+        result[i] = ('').join(result[i]) + calc_status(result[i], was_recovered)
+    
     return result
+
+
+def recovery_digit(digit):
+    result = []
+    posHorizontalLine = [1, 4, 7]
+    posVerticalLine = [3, 5, 6, 8]
+    
+    for i in posHorizontalLine:
+        rec_digit = copy.copy(digit)
+        rec_digit[i] = '_'
+        rec_digit = ('').join(rec_digit)
+        if rec_digit in digits_dict:
+            result += digits_dict[rec_digit]
+   
+    for i in posVerticalLine:
+        rec_digit = copy.copy(digit)
+        rec_digit[i] = '|'
+        rec_digit = ('').join(rec_digit)
+        if rec_digit in digits_dict:
+            result += digits_dict[rec_digit]
+    
+    if not result:
+        return ['?']
+    
+    return result
+
+
+def calc_status(code, was_recovered):
+    if '?' in code:
+        return ' ILL'
+    
+    weight_sum = 0
+    for i in range(len(code)):
+        weight_sum += int(code[i]) * (len(code) - i)
+
+    if (weight_sum % WEIGHT_COEF) != 0:
+        return ' ERROR'
+    elif was_recovered:
+        return ' RECOVERED'
+    else:
+        return ''
 
 
 def procces_file_data(file_data):
@@ -76,20 +130,11 @@ def procces_file_data(file_data):
                 values[i] += row_data[col_idx:col_idx+DIGIT_WIDTH]
         
         conv_digit = convert_digits(values)
-        result.append(conv_digit)
+        for digit in conv_digit:
+            result.append(digit)
     
     return result
 
-def is_corrected(code):
-    if '?' in code:
-        return code + ' ILL'
-    
-    weight_sum = 0
-    for i in range(len(code)):
-        weight_sum += int(code[i]) * (len(code) - i)
-
-    return code + ' ERROR' if weight_sum % WEIGHT_COEF else code
-    
 
 def main():
     if args.input_file:
@@ -98,9 +143,6 @@ def main():
         file_data = read_console()
 
     res = procces_file_data(file_data)
-
-    for i in range(len(res)):
-        res[i] = is_corrected(res[i])
 
     if args.output_file:
         write_file(args.output_file, res)

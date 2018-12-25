@@ -33,8 +33,8 @@ class DigitConverterTest(unittest.TestCase):
 
         self.test_incorrect_input_list = [
             ' _       _   _       _   _   _   _ \n'
-            '| |      _|  _|  _| |_  |     | |_|\n'
-            '|_|   | |_   _|   |  _| |_|   | |_|\n'
+            '| |   |  _|  _|  _  |_  |     | |_|\n'
+            '|_|   | |_   _|   |  _| |_    | |_|\n'
             '                                   ',
 
             ' _       _   _       _   _       _ \n'
@@ -43,13 +43,13 @@ class DigitConverterTest(unittest.TestCase):
             '                                   ',
 
             ' _       _   _       _   _   _   _ \n'
-            '|aa   |  _\  BB |_| 178 |_    | |_|\n'
+            '|aa   |  |\  BB |_| 178 |_    | |_|\n'
             '|_|   | |_   _|   |  _| *_*   | |_|\n'
             '                                   '
         ]
 
         self.expected_incorrect_result = [
-            '0?23?5?78 ILL',
+            '0123?5?78 ILL',
             '0123?56?8 ILL',
             '?1??4??78 ILL'
         ]
@@ -64,6 +64,12 @@ class DigitConverterTest(unittest.TestCase):
             'digits_incorrect_example_1.txt' : '?0000?0?1 ILL',
             'digits_incorrect_example_2.txt' : '01?345678 ILL',
             'digits_incorrect_example_3.txt' : '0?2?456?? ILL'
+        }
+
+        self.test_recovered_input_files = {
+            'digits_recovered_example_1.txt' : '123456789 RECOVERED\n'
+                                               '123450789 ERROR\n'
+                                               '123456789 RECOVERED'
         }
 
     def test_correct_input_console(self):
@@ -115,6 +121,14 @@ class DigitConverterTest(unittest.TestCase):
     def test_incorrect_input_file(self):
         # Input file incorrect
         for file_name, result in self.test_incorrect_input_files.items():
+            command = ["python", "lab_2.py", "-i", file_name]
+            p = Popen(command, stdout=PIPE, stdin=PIPE)
+            output = p.communicate()[0]
+            self.assertEqual(output.rstrip(), result)
+
+    def test_recovered_input_file(self):
+        # Input file | Output to console
+        for file_name, result in self.test_recovered_input_files.items():
             command = ["python", "lab_2.py", "-i", file_name]
             p = Popen(command, stdout=PIPE, stdin=PIPE)
             output = p.communicate()[0]
