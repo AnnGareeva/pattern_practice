@@ -4,6 +4,9 @@ import copy
 import argparse
 from itertools import product
 
+if __name__ != '__main__':
+    raise ImportError("Imports are not allowed")
+
 NUM_LINES_IN_DIGIT = 4
 NUM_DIGITS = 9
 DIGIT_WIDTH = 3
@@ -31,7 +34,7 @@ def read_console():
     for line in sys.stdin:
         result.append(line)
     if len(result) % NUM_LINES_IN_DIGIT != 0:
-        raise SystemError('Incorrect number of lines in console')
+        raise IOError('Incorrect number of lines in console')
     return result
 
 def write_console(codes):
@@ -47,7 +50,7 @@ def read_file(file_name):
         file_data = f.readlines()
         
         if len(file_data) % NUM_LINES_IN_DIGIT != 0:
-            raise SystemError('Incorrect number of lines in file')
+            raise IOError('Incorrect number of lines in file')
 
     return file_data
 
