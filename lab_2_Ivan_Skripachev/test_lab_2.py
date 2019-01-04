@@ -3,6 +3,7 @@ import unittest
 import sys
 from subprocess import Popen, PIPE
 
+# Нужен тест на функцию convert_digits
 class DigitConverterTest(unittest.TestCase):
     def setUp(self):
         self.test_correct_input_list = [

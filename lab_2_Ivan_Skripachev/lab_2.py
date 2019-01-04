@@ -1,6 +1,9 @@
 import os
 import argparse
 
+# Глобально: ошибка во входных данных не должна приводить к падению (непойманному исключению)
+# После ошибки в одном из сканов (чисел) должна быть возможность продолжить читать файл
+
 MAX_LEN_LINE = 39
 NUM_LINES_IN_DIGIT = 4
 MAX_NUM_DIGITS = 10
@@ -9,8 +12,11 @@ DIGIT_WIDTH = 3
 parser = argparse.ArgumentParser(add_help=True)
 parser.add_argument('-i', action='store', dest='input_file',  help='Path to file with input digits')
 parser.add_argument('-o', action='store', dest='output_file', help='Path to file for result')
+# Здесь не может ли возникнуть нежелаемых сайд-эффектов на загрузке
+# lab_2.py в качестве модуля?
 args = parser.parse_args()
 
+# Здесь в качестве ключей можно использовать многострочные строковые литералы
 digits_dict = {'._.|.||_|...': '0',
                '.....|..|...': '1',
                '._.._||_....': '2',
@@ -22,7 +28,7 @@ digits_dict = {'._.|.||_|...': '0',
                '._.|_||_|...': '8',
                '._.|_|._|...': '9'}
 
-
+# В чем причина того, что логига чтения из консоли и из файла отличаются?
 def read_console():
     result = []
     
@@ -30,6 +36,7 @@ def read_console():
     while True:
         for i in range(NUM_LINES_IN_DIGIT):
             input_data = raw_input()
+			# В чем смысл этого исключения
             if len(input_data) > MAX_LEN_LINE:
                 raise SystemError('Incorrect input')
             elif len(input_data) < MAX_LEN_LINE:
@@ -40,11 +47,15 @@ def read_console():
     
     return result
 
-
+# Непонятно в данный момент, кто должен обрабатывать ошибки длины ввода
+# и почему одна строка не той длины обрывает весь поток ввода
+# Коды было бы логичней считывать независимо друг от друга
 def read_file(file_name):
     if not os.path.exists(file_name):
         raise NameError('File not exist: ' + file_name)
 
+	# Открытие файла достаточно часто сопровождается ошибками
+	# нужно сообщать о них пользователю утилиты
     with open(file_name, 'r') as f:
         file_data = f.readlines()
         
