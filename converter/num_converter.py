@@ -4,6 +4,9 @@ import argparse
 class Converter:
     _roman_symbols = {"i": 1, "v": 5, "x": 10, "l": 50, "c": 100, "d": 500, "m": 1000}
 
+	# Использование exception'ов одного типа является не очень хорошим решением
+	# У пользователя нет возможности ловить только конкретные ошибки по типам исключений
+	# При этом на каждую ошибку вводить отдельный тип исключения тоже не стоит
     def _valid_roman_value(self, roman_num):
         if not isinstance(roman_num, str):
             raise ValueError('The passed value is not string')
@@ -31,9 +34,13 @@ class Converter:
     
 
     def arab_to_roman(self, arab_num):
+		# Что это?
         dict_roman = sorted(Converter._roman_symbols, key=Converter._roman_symbols.get, reverse=True)
         dict_roman = {roman_symb:Converter._roman_symbols[roman_symb] for roman_symb in dict_roman}
 
+		# Такие конструкции неудобно читать
+		# Правильный подход: проверить ошибку и выйти из функции как можно раньше
+		# в случа ее наличия
         if self._valid_arab_value(arab_num):
             self.arab_value = arab_num
             roman_num = ''

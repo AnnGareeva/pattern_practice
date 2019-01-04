@@ -7,6 +7,9 @@ class RomanToArabConverterTest(unittest.TestCase):
         self.conv = Converter()
 
     def test_valid_input(self):
+		# Данные примеры не являются корректными римскими числами
+		# Также непллохо бы отдельно написать тесты на функцию проверки
+		# Корректности числа
         self.assertEqual(self.conv.roman_to_arab('IIIII'), 5)
         self.assertEqual(self.conv.roman_to_arab('IXI'), 10)
         self.assertEqual(self.conv.roman_to_arab('VXICL'), 154)
@@ -46,6 +49,7 @@ class ArabToRomanConverterTest(unittest.TestCase):
 
 
     def test_valid_input(self):
+		# Этот тест фейлится с IndexError: list index out of range
         self.assertEqual(self.conv.arab_to_roman(317),  'CCCXVII')
         self.assertEqual(self.conv.arab_to_roman(199),  'CXCIX')
         self.assertEqual(self.conv.arab_to_roman(149),  'CXLIX')
