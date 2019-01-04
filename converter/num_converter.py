@@ -6,7 +6,7 @@ class Converter:
 
     def _valid_roman_value(self, roman_num):
         if not isinstance(roman_num, str):
-            raise ValueError('The passed value is not string')
+            raise TypeError('The passed value is not string')
 
         result = roman_num.lower()
         
@@ -87,7 +87,7 @@ class Converter:
                 list_arab_nums[prev_val_idx] = -1
         
         if result > 3000:
-            raise ValueError('Roman value should be less then 3000')
+            raise OverflowError('Roman value should be less then 3000')
         
         return result
 
