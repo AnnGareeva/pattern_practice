@@ -29,21 +29,20 @@ class RomanToArabConverterTest(unittest.TestCase):
         try:
             self.conv.roman_to_arab(157)
             self.assertTrue(False)
-        except ValueError:
+        except TypeError:
             self.assertTrue(True)
 
     def test_overflow(self):
         try:
             self.conv.roman_to_arab('IMMMCCLL')
             self.assertTrue(False)
-        except ValueError:
+        except OverflowError:
             self.assertTrue(True)
 
 
 class ArabToRomanConverterTest(unittest.TestCase):
     def setUp(self):
         self.conv = Converter()
-
 
     def test_valid_input(self):
         self.assertEqual(self.conv.arab_to_roman(317),  'CCCXVII')
@@ -52,18 +51,17 @@ class ArabToRomanConverterTest(unittest.TestCase):
         self.assertEqual(self.conv.arab_to_roman(1721), 'MDCCXXI')
         self.assertEqual(self.conv.arab_to_roman(2975), 'MMCMLXXV')
 
-
     def test_invalid_input(self):
         try:
             self.conv.arab_to_roman('432a')
             self.assertTrue(False)
-        except ValueError:
+        except TypeError:
             self.assertTrue(True)
 
         try:
             self.conv.arab_to_roman('')
             self.assertTrue(False)
-        except ValueError:
+        except TypeError:
             self.assertTrue(True)
 
         try:
@@ -72,12 +70,11 @@ class ArabToRomanConverterTest(unittest.TestCase):
         except ValueError:
             self.assertTrue(True)
 
-
     def test_overflow(self):
         try:
             self.conv.arab_to_roman('43242')
             self.assertTrue(False)
-        except ValueError:
+        except OverflowError:
             self.assertTrue(True)
 
 
