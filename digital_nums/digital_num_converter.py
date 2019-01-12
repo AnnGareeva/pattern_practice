@@ -2,10 +2,11 @@ import argparse
 from functools import reduce
 import os
 import sys
+from itertools import product
 
 __all__ = ['convert_digital_nums']
 NUM_IN_LINE = 9
-NUMBER_SIZE = 3 #3x3
+NUMBER_SIZE = 3
 INDENT_SIZE = 1
 
 
@@ -29,23 +30,17 @@ class DigitalNumber:
         self.center_up     = None
         self.center_middle = None
         self.center_down   = None
-        self.number = None
+        self.number        = None
+        self.digital_num   = None
 
     def convert_to_num(self):
-        position_list = [self.left_up,
-                         self.left_down,
-                         self.right_up,
-                         self.right_down,
-                         self.center_up,
-                         self.center_middle,
-                         self.center_down]
         for key, value in self.matching_num_dict.items():
-            if value == position_list:
+            if value == self.digital_num:
                 res_number = int(key)
                 self.number = res_number
                 break
 
-    def digital2num(self, digital_num_str):
+    def set_flag_list(self, digital_num_str):
         horiz_line = '_'
         vert_line = '|'
         self.left_up       = True if vert_line  == digital_num_str[1][0] else False
@@ -55,6 +50,17 @@ class DigitalNumber:
         self.center_up     = True if horiz_line == digital_num_str[0][1] else False
         self.center_middle = True if horiz_line == digital_num_str[1][1] else False
         self.center_down   = True if horiz_line == digital_num_str[2][1] else False
+        position_list = [self.left_up,
+                         self.left_down,
+                         self.right_up,
+                         self.right_down,
+                         self.center_up,
+                         self.center_middle,
+                         self.center_down]
+        self.digital_num = position_list
+
+    def digital2num(self, digital_num_str):
+        self.set_flag_list(digital_num_str)
         self.convert_to_num()
         return self.number
 
@@ -64,28 +70,6 @@ def convert_list2str(list_elem):
     return string
 
 
-def convert_data_to_num_list(data):
-    start_vertical = 0
-    num_list = []
-    while start_vertical < len(data):
-        start_horizontal = 0
-        num_str = []
-        while start_horizontal < len(data[start_vertical]):
-            digital_num_obj = DigitalNumber()
-            digital_number = [num_block[start_horizontal:start_horizontal + NUMBER_SIZE]
-                              for num_block in data[start_vertical:start_vertical + NUMBER_SIZE]]
-            number = digital_num_obj.digital2num(digital_number)
-            if number == None:
-                number = 'None'
-            #     raise Exception('Invalid combination of symbols. Number is not found ')
-            num_str.append(number)
-            start_horizontal += NUMBER_SIZE + INDENT_SIZE
-        num_list.append(num_str)
-        start_vertical += NUMBER_SIZE + INDENT_SIZE
-    return num_list
-
-
-# VALIDATION
 def check_valid_symbols(data):
     valid_symb = ['\n', ' ', '|', '_', '.']
     for string in data:
@@ -111,7 +95,7 @@ def del_serv_char(data):
     for i in range(len(data)):
         line = data[i]
         if '\n' in line:
-            line = line.replace('\n','')
+            line = line.replace('\n', '')
             data[i] = line
     return data
 
@@ -145,13 +129,15 @@ def read_from_terminal():
 def write_to_file(list_num, filename):
     with open(filename, 'w') as f:
         for line in list_num:
-            f.writelines(line)
-            f.write('\n')
+            for var in line:
+                f.writelines(var)
+                f.write('\n')
 
 
 def write_to_terminal(list_num):
     for line in list_num:
-        print(line)
+        for var in line:
+            print(var)
 
 
 def check_sum(numbers):
@@ -163,31 +149,92 @@ def check_sum(numbers):
         return '{num} error'.format(num=convert_list2str(numbers))
 
 
+def count_dif_vals(list1, list2):
+    dif_counter = 0
+    dif_idx = None
+    for idx in range(len(list1)):
+
+        if list1[idx] != list2[idx]:
+            dif_counter += 1
+            dif_idx = idx
+    if dif_counter < 2:
+        return dif_idx
+    else:
+        return None
+
+
+
+
+def recover_none_num(dg_num_obj, digital_number):
+    dg_num_obj.set_flag_list(digital_number)
+    varients_list = []
+    for key, val in dg_num_obj.matching_num_dict.items():
+        dif_flag = count_dif_vals(val, dg_num_obj.digital_num) 
+        if dif_flag:
+            varients_list.append(int(key))
+    if not varients_list:
+        return ['None']
+    return varients_list
+
+
+def processing_line(parsed_num_list, flag_none_in_line):
+    checked_num_list = []
+    for card_num in parsed_num_list:
+        if 'None' not in card_num:
+            result_str = check_sum(card_num)
+            if flag_none_in_line and 'error' not in result_str:
+                    result_str += ' recovered'
+        else:
+            result_str = convert_list2str(card_num).replace('None', '?') + ' ill'
+        checked_num_list.append(result_str)
+    return checked_num_list
+
+
+def convert_data_to_num_list(data):
+    start_vertical = 0
+    num_list = []
+    while start_vertical < len(data):
+        start_horizontal = 0
+        num_seq = []
+        flag_none_in_line = False
+        while start_horizontal < len(data[start_vertical]):
+            varients_of_number = []
+            digital_num_obj = DigitalNumber()
+            digital_number = [num_block[start_horizontal:start_horizontal + NUMBER_SIZE]
+                              for num_block in data[start_vertical:start_vertical + NUMBER_SIZE]]
+            number = digital_num_obj.digital2num(digital_number)
+            if number == None:
+                varients_of_number = recover_none_num(digital_num_obj, digital_number)
+                flag_none_in_line = True
+            else:
+                varients_of_number.append(number)
+            num_seq.append(varients_of_number)
+            start_horizontal += NUMBER_SIZE + INDENT_SIZE
+        parsed_num_list = list(product(*num_seq))
+        num_list.append(processing_line(parsed_num_list, flag_none_in_line))
+        start_vertical += NUMBER_SIZE + INDENT_SIZE
+    return num_list
+
+
+def get_parsing_result(data):
+    parsed_num_list = convert_data_to_num_list(data)
+    return parsed_num_list
+
+
 def convert_digital_nums():
     arg_parser = argparse.ArgumentParser(description='Coverter digital numbers from file to usual numbers')
     arg_parser.add_argument('-i', '--input',  default=None, help='input filename for reading')
     arg_parser.add_argument('-o', '--output', default=None, help='output filename for writing')
     args = arg_parser.parse_args()
-
     if args.input:
         data = read_from_file(args.input)
     else:
         data = read_from_terminal()
-
-    parsed_num_list = convert_data_to_num_list(data)
-    checked_num_list = []
-    for card_num in parsed_num_list:
-        if 'None' not in card_num:
-            result_str = check_sum(card_num)
-            checked_num_list.append(result_str)
-        else:
-            result_str = convert_list2str(card_num).replace('None', '?') + ' ill'
-            checked_num_list.append(result_str)
-    
+    result_num_list = get_parsing_result(data)
     if args.output:
-        write_to_file(checked_num_list, args.output)
+        write_to_file(result_num_list, args.output)
     else:
-        write_to_terminal(checked_num_list)
+        write_to_terminal(result_num_list)
 
 
 if __name__ == "__main__":

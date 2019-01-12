@@ -1,7 +1,6 @@
 import unittest
-import os
-import sys
 import subprocess
+
 
 class DigitalNumberTest(unittest.TestCase):
     script_name = 'digital_num_converter.py'
@@ -17,15 +16,20 @@ class DigitalNumberTest(unittest.TestCase):
                                     "... ... ... ... ... ... ... ... ...\n"\
                                     "._. ._. ._. ._. ._. ._. ._. ._. ...\n"\
                                     "|.| |.| |.| |_| |.| |.. |.| |_| ..|\n"\
+                                    "|_| |_| |_| |_| |_| |_. |_| ._| ..|\n"\
+                                    "... ... ... ... ... ... ... ... ...\n"\
+                                    "._. ._. ._. ._. ._. ._. ._. ... ...\n"\
+                                    "|.| |.| |.| |.| |.| |.| |.| |_. ..|\n"\
                                     "|_| |_| |_| |_| |_| |_| |_| ._| ..|\n"\
                                     "... ... ... ... ... ... ... ... ...\n"
-
         self.valid_answer =   '012345678 error\n'\
                               '000000051\n'\
-                              '00080?091 ill\n'
-        self.valid_answer_file = '0???????? ill\n'\
-                                 '000000051\n'\
-                                 '012345678 error\n'
+                              '00080?091 ill\n' \
+                              '000000051 recovered\n'
+        self.valid_answer_file = '012345678 error\n'\
+                                '000000051\n'\
+                                '00080?091 ill\n' \
+                                '000000051 recovered\n'
         self.invalid_count_num_input_terminal =  '._. ... ._. ._. ... ._. ._. ._. ._.\n'\
                                                  '|.| ..| ._| ._| |_| |_. |_. ..| |_|\n'\
                                                  '|_| ..| |_. ._| ..| ._| |_| ..| |_|\n'\
@@ -72,8 +76,7 @@ class DigitalNumberTest(unittest.TestCase):
         with open(output_name_file, 'r') as f:
             data_from_files = f.read()
         self.assertEqual(data_from_files, self.valid_answer)
-    
-    
+
     def test_invalid_input_terminal_output_file(self):
         output_name_file = 'res.txt'
         cmd = ['python', self.script_name, '-o', output_name_file]
@@ -127,6 +130,7 @@ class DigitalNumberTest(unittest.TestCase):
                 self.assertTrue(False)
             except:
                 self.assertTrue(True) 
+
 
 if __name__ == '__main__':
     unittest.main()
